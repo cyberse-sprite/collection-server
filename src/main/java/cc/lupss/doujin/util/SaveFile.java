@@ -1,7 +1,6 @@
 package cc.lupss.doujin.doujinserver.util;
 
-import cc.lupss.doujin.doujinserver.entity.Comic;
-import cc.lupss.doujin.doujinserver.entity.Tag;
+import cc.lupss.doujin.doujinserver.dal.database.ContentDO;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.tomcat.util.buf.StringUtils;
@@ -17,21 +16,21 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class SaveFile {
-    public static SaveFileInfo getInfoName(Comic comic) {
+    public static SaveFileInfo getInfoName(ContentDO contentDO) {
         Map<String, List<String>> map = new HashMap<>();
-        List<Tag> tags = comic.getTags();
-        if (tags != null) {
-            for (Tag tag : tags) {
-                List<String> addTags;
-                if (map.containsKey(tag.getType())) {
-                    addTags = map.get(tag.getType());
-                } else {
-                    addTags = new ArrayList<>();
-                }
-                addTags.add(tag.getValue());
-                map.put(tag.getType(), addTags);
-            }
-        }
+//        List<Tag> tags = contentDO.getTags();
+//        if (tags != null) {
+//            for (Tag tag : tags) {
+//                List<String> addTags;
+//                if (map.containsKey(tag.getType())) {
+//                    addTags = map.get(tag.getType());
+//                } else {
+//                    addTags = new ArrayList<>();
+//                }
+//                addTags.add(tag.getValue());
+//                map.put(tag.getType(), addTags);
+//            }
+//        }
         String creator = "";
         if (map.containsKey("group")) {
             List<String> groups = map.get("group");
@@ -56,13 +55,13 @@ public class SaveFile {
         if (!creator.equals("")) {
             infoName += String.format("[%s]", creator);
         }
-        infoName += comic.getTitle();
+        infoName += contentDO.getTitle();
         if (map.containsKey("origin")) {
             infoName += String.format("(%s)", StringUtils.join(map.get("origin"), ','));
         }
-        if (!Objects.equals(comic.getLanguage(), "") && comic.getLanguage() != null) {
-            infoName += String.format("[%s]", comic.getLanguage());
-        }
+//        if (!Objects.equals(contentDO.getLanguage(), "") && contentDO.getLanguage() != null) {
+//            infoName += String.format("[%s]", contentDO.getLanguage());
+//        }
         if (map.containsKey("charactor")) {
             infoName += String.format("(%s)", StringUtils.join(map.get("charactor"), ','));
         }
@@ -149,8 +148,8 @@ public class SaveFile {
         return "";
     }
 
-    public static SaveFileInfo saveImagesAsZip(Comic comic, MultipartFile[] files, String tempPath, String resPath) {
-        SaveFileInfo info = getInfoName(comic);
+    public static SaveFileInfo saveImagesAsZip(ContentDO contentDO, MultipartFile[] files, String tempPath, String resPath) {
+        SaveFileInfo info = getInfoName(contentDO);
         if (!Objects.equals(info.getInfoName(), "")) {
             try {
                 String[] path = mkZip(files, tempPath, resPath, info);
