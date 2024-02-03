@@ -1,4 +1,4 @@
-package cc.lupss.doujin.doujinserver.config;
+package cc.lupss.doujin.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;

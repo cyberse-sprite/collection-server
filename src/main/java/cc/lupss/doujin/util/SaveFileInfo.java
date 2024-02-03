@@ -1,4 +1,4 @@
-package cc.lupss.doujin.doujinserver.util;
+package cc.lupss.doujin.util;
 
 import lombok.Data;
 

@@ -1,4 +1,4 @@
-package cc.lupss.doujin.doujinserver;
+package cc.lupss.doujin;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,6 +1,6 @@
-package cc.lupss.doujin.doujinserver.util;
+package cc.lupss.doujin.util;
 
-import cc.lupss.doujin.doujinserver.dal.database.ContentDO;
+import cc.lupss.doujin.dal.database.ContentDO;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.tomcat.util.buf.StringUtils;

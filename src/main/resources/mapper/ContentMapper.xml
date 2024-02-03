@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cc.lupss.doujin.dal.mapper.ContentMapper">
+    <resultMap id="ComicResultMap" type="cc.lupss.doujin.controller.vo.Comic">
+        <result property="publishTime" column="publish_time" typeHandler="cc.lupss.doujin.dal.handler.TimeHandler"/>
+        <result property="createTime" column="create_time" typeHandler="cc.lupss.doujin.dal.handler.TimeHandler"/>
+        <result property="updateTime" column="update_time" typeHandler="cc.lupss.doujin.dal.handler.TimeHandler"/>
+        <association property="image" column="{cid=id}" javaType="java.lang.String" select="selectImage"/>
+        <collection property="tags" column="{cid=id}" ofType="cc.lupss.doujin.controller.vo.Tag"
+                    javaType="java.util.ArrayList" select="selectTags">
+        </collection>
+    </resultMap>
+    <resultMap id="TagResultMap" type="cc.lupss.doujin.controller.vo.Tag">
+    </resultMap>
+    <resultMap id="HomeResultMap" type="cc.lupss.doujin.controller.vo.ComicHome">
+    </resultMap>
+    <resultMap id="ModelTagResultMap" type="cc.lupss.doujin.controller.vo.ModelTag">
+        <collection property="tags" column="name=name" select="selectCategoryTags"/>
+    </resultMap>
+    <resultMap id="TagNumResultMap" type="cc.lupss.doujin.controller.vo.TagNum">
+    </resultMap>
+
+    <select id="selectComicsPage" resultMap="ComicResultMap">
+        select * from content
+        where model = 'comic'
+        <if test="ew!=null and ew.nonEmptyOfWhere">
+            AND ${ew.sqlSegment}
+        </if>
+        order by publish_time desc
+    </select>
+
+    <select id="selectComic" resultMap="ComicResultMap">
+        select *
+        from content
+        where id = #{id}
+    </select>
+
+    <select id="selectTags" resultMap="TagResultMap">
+        select *
+        from relationship b
+                 left join content c on id = tid
+        where cid = #{cid}
+          and model in (select name from model where parent = 1)
+    </select>
+
+    <select id="selectImage" resultType="java.lang.String">
+        select content
+        from relationship b
+                 left join content c on id = tid
+        where cid = #{cid}
+          and model = 'image'
+        limit 1
+    </select>
+
+    <select id="selectHome" resultMap="HomeResultMap">
+        select a.id, a.title, max(c.id) as first, count(c.id) as num
+        from (select * from content where model = 'origin') a
+                 left join relationship b on b.tid = a.id
+                 left join content c on c.id = b.cid
+        group by id, title
+    </select>
+
+    <select id="selectModelTag" resultMap="ModelTagResultMap">
+        select id, name, title
+        from model
+        where parent = 1
+    </select>
+
+    <select id="selectCategoryTags" resultMap="TagNumResultMap">
+        select a.id, a.title, count(c.id) as num
+        from (select * from content where model = #{name}) a
+                 left join relationship b on b.tid = a.id
+                 left join content c on c.id = b.cid
+        group by id, title
+        order by num desc
+        limit 10
+    </select>
+
+</mapper>

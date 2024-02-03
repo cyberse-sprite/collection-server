@@ -1,4 +1,4 @@
-package cc.lupss.doujin.doujinserver.dal.database;
+package cc.lupss.doujin.dal.database;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;

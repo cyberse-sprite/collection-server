@@ -1,20 +1,19 @@
-package cc.lupss.doujin.doujinserver.controller;
+package cc.lupss.doujin.controller;
 
-import cc.lupss.doujin.doujinserver.controller.vo.Comic;
-import cc.lupss.doujin.doujinserver.dal.database.ContentDO;
-import cc.lupss.doujin.doujinserver.dal.mapper.ContentMapper;
-import cc.lupss.doujin.doujinserver.service.ContentService;
-import cc.lupss.doujin.doujinserver.util.Result;
+import cc.lupss.doujin.controller.vo.Comic;
+import cc.lupss.doujin.dal.database.ContentDO;
+import cc.lupss.doujin.dal.mapper.ContentMapper;
+import cc.lupss.doujin.service.ContentService;
+import cc.lupss.doujin.util.Result;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,59 +42,23 @@ public class ComicController {
             add(new String[]{"publish_time", "true"});
             add(new String[]{"update_time", "true"});
         }};
-        return Result.ok().data("list", contentMapper.selectComicsPage(page, null));
-    }
-
-    @GetMapping("/comic/upload")
-    public Result ComicUploadInfo() {
-//        List<Tag> tags = tagService.list();
-//        Map<String, List<Tag>> map = new HashMap<>();
-//        for (Tag one : tags) {
-//            String tagType = one.getType();
-//            if (map.containsKey(tagType)) {
-//                List<Tag> list = map.get(tagType);
-//                list.add(one);
-//                map.put(tagType, list);
-//            } else {
-//                List<Tag> list = new ArrayList<>();
-//                list.add(one);
-//                map.put(tagType, list);
-//            }
-//        }
-        return Result.ok().data("selections", "");
+        return Result.ok().data("comics", contentMapper.selectComicsPage(page, null));
     }
 
     @GetMapping("/comic")
     public Result getComic(Integer id) {
-        return Result.ok().data("comic", contentService.getById(id));
+        return Result.ok().data("comic", contentMapper.selectComic(id));
     }
 
     @GetMapping(value = "/comic/thumb", produces = MediaType.IMAGE_JPEG_VALUE)
     @ResponseBody
-    public byte[] ComicThumb(String id) throws Exception {
-//        ContentDO contentDO = contentService.getById(id);
-//        File file = new File(resPath + contentDO.getImage());
-//        FileInputStream inputStream = new FileInputStream(file);
-//        byte[] bytes = new byte[inputStream.available()];
-//        inputStream.read(bytes, 0, inputStream.available());
-//        return bytes;
-        return (new byte[10]);
-    }
-
-    @GetMapping("/comic/res")
-    @ResponseBody
-    public void viewOrigin(int id, HttpServletRequest request, HttpServletResponse response) throws IOException {
-//        ContentDO contentDO = contentService.getById(id);
-//        String path = resPath + contentDO.getFilePath();
-//        File file = new File(path);
-//        String filename = FilenameUtils.getName(contentDO.getFilePath());
-//        response.setHeader("content-disposition", "attachment; filename=" + URLEncoder.encode(filename, "UTF-8"));
-//        InputStream in = new FileInputStream(file);
-//        byte[] buf = new byte[1024];
-//        while (in.read(buf) > 0) {
-//            response.getOutputStream().write(buf, 0, buf.length);
-//        }
-//        in.close();
+    public byte[] ComicThumb(Integer id) throws Exception {
+        Comic contentDO = contentMapper.selectComic(id);
+        File file = new File(resPath + contentDO.getImage());
+        FileInputStream inputStream = new FileInputStream(file);
+        byte[] bytes = new byte[inputStream.available()];
+        inputStream.read(bytes, 0, inputStream.available());
+        return bytes;
     }
 
     @PostMapping("/comic")
@@ -112,11 +75,8 @@ public class ComicController {
         return Result.ok();
     }
 
-    @PostMapping("/comic/own")
-    public Result setComicOwn(Integer id, boolean own) {
-        ContentDO contentDO = contentService.getById(id);
-//        contentDO.setOwn(own);
-        contentService.updateById(contentDO);
-        return Result.ok();
+    @GetMapping("/comic/upload")
+    public Result ComicUploadInfo() {
+        return Result.ok().data("selections", "");
     }
 }
